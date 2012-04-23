@@ -1,0 +1,97 @@
+SHELL = /bin/bash
+
+# THESE VARIABLES MAY CHANGE BETWEEN PACKAGES
+
+##-----------ADDED -----------------------------------------------
+# Makefile for ptpd
+
+RM = rm -f
+CFLAGS += -Wall -DPTPD_DBG -DPTPD_NO_DAEMON -DBSD_INTERFACE_FUNCTIONS
+#CPPFLAGS =   -DPTPD_DBGV -DPTPD_NO_DAEMON
+LDFLAGS = -lm -lrt
+
+PROG = ptpd2
+SRCS = ptpd.cc arith.cc bmc.cc protocol.cc display.cc\
+	dep/msg.cc dep/net.cc dep/servo.cc dep/startup.cc dep/sys.cc dep/timer.cc
+
+OBJS = $(SRCS:.cc=.o)
+
+HDRS = ptpd.hh constants.hh datatypes.hh \
+	dep/ptpd_dep.hh dep/constants_dep.hh dep/datatypes_dep.hh dep/timer.hh
+
+CSCOPE = cscope
+GTAGS = gtags
+DOXYGEN = doxygen
+
+TAGFILES = GPATH GRTAGS GSYMS GTAGS cscope.in.out cscope.out cscope.po.out
+
+CC = g++
+
+.cc.o:
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
+
+all: $(PROG)
+
+$(PROG): $(OBJS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJS)
+
+$(OBJS): $(HDRS)
+
+tags:
+	$(CSCOPE) -R -q -b
+	$(GTAGS)
+	$(DOXYGEN) Doxyfile
+
+clean:
+	$(RM) $(PROG) $(OBJS) $(TAGFILES) make.out
+
+##------------------------------------------------------------------
+
+
+# Set 'package' to the name of your package.
+package := ptpd2
+
+# Set these variables appropriately.
+top_builddir := .
+subdir := .
+
+# Require Click prefix settings.
+# Generally, you will provide a '--with-click=CLICKPREFIX' option, and set:
+include /usr/local/bin/share/click/config.mk
+include /usr/local/bin/share/click/pkg-config.mk
+
+srcdir = .
+top_srcdir = .
+AUTOCONF = $(CLICKAUTOCONF)
+ACLOCAL = :
+
+TARGETS = package
+
+all: Makefile $(TARGETS)
+
+package: Makefile
+	@cd package && $(MAKE) all
+
+elemlist: Makefile
+	@cd package && $(MAKE) elemlist
+
+install: Makefile
+	@for d in $(TARGETS); do (cd $$d && $(MAKE) install) || exit 1; done
+
+$(srcdir)/configure: $(srcdir)/configure.ac
+	cd $(srcdir) && $(ACLOCAL) && $(AUTOCONF)
+config.status: $(srcdir)/configure
+	$(SHELL) $(srcdir)/configure  '-prefix=/usr/local/bin'
+Makefile: config.status $(srcdir)/Makefile.in
+	cd $(top_builddir) && \
+	  CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
+
+clean:
+	@-for d in $(TARGETS); do (cd $$d && $(MAKE) clean); done
+
+distclean:
+	@-for d in $(TARGETS); do (cd $$d && $(MAKE) distclean); done
+	-rm -f Makefile config.status config.cache config.log config.h
+
+.PHONY: all package elemlist clean distclean \
+	install install-doc install-man install-include

@@ -1,0 +1,6 @@
+<?xml version="1.0" standalone="yes"?>
+<?xml-stylesheet type="application/xml" href="http://www.lcdf.org/click/xml/elementmap.xsl"?>
+<?xml-stylesheet type="application/xml" href="file:///home/keno/Desktop/click-2.0.1/etc/ptpd2pack_r4/package/etc/elementmap.xsl"?>
+<elementmap xmlns="http://www.lcdf.org/click/xml/" sourcedir="/home/keno/Desktop/click-2.0.1/etc/ptpd2pack_r4/package" src="file:///home/keno/Desktop/click-2.0.1/etc/ptpd2pack_r4/package" provides="ptpd2" drivers="userlevel">
+<entry name="PTPd2PackageElement" cxxclass="PTPd2PackageElement" headerfile="./ptpd2pack.hh" sourcefile="./ptpd2pack.cc" portcount="0/0" processing="a/a" flowcode="x/x" />
+</elementmap>
